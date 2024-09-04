@@ -1,5 +1,6 @@
 import detectEthereumProvider from "@metamask/detect-provider"
 import Web3 from "web3"; 
+import ABI from './abi.json'
 
 async function connect(code) {
     
@@ -69,7 +70,43 @@ async function startApp(provider) {
   const bal = await web3.eth.getBalance(account);
   console.log(bal);
   console.log(account);
+  localStorage.setItem("acc",account.toString());
   }
 }
 
 
+async function callContract() {
+  const web3 = new Web3(window.ethereum);
+  const abiInstance = ABI.abi;
+  const contract = new web3.eth.Contract(
+                                    abiInstance,
+                     "0xddFA5fE9a651eF1411605dA65D73971429841280");
+  
+  const myAddress = localStorage.getItem("acc");
+  contract.methods.fetch()
+    .call({from: myAddress})
+    .then((result) => {
+        console.log('Return Value:', result);
+    })
+    .catch((error) => {
+        console.error('Call Error:', error);
+    });
+}
+window.callContract = callContract;
+
+
+async function updateContract() {
+  const web3 = new Web3(window.ethereum);
+  const abiInstance = ABI.abi;
+  const contract = new web3.eth.Contract(
+                                    abiInstance,
+                     "0xddFA5fE9a651eF1411605dA65D73971429841280");
+  
+  const myAddress = localStorage.getItem("acc");
+  contract.methods.increment()
+    .send({from: myAddress})
+    .catch((error) => {
+        console.error('Call Error:', error);
+    });
+}
+window.updateContract = updateContract;
